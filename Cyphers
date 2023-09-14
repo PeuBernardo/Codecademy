@@ -1,0 +1,173 @@
+#Task 1:
+
+#Started defining a variable to hold the alphabet, then other ones for both the encoded message and its decoded version.
+
+alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+encoded_message = "xuo jxuhu! jxyi yi qd unqcfbu ev q squiqh syfxuh. muhu oek qrbu je tusetu yj? y xefu ie! iudt cu q cuiiqwu rqsa myjx jxu iqcu evviuj!"
+
+decoded_message = ""
+
+"""
+I didn't use, at first, a function to receive the message. For the first tasks, a 'for' loop seemed enough.
+
+About the 'for' loop, I thought it should iterate through each character in the coded message, finding its relative position in the alphabet and adding its position to the offset value manually. 
+
+At the start, I nested an 'elif' conditional that would give different treatments for spaces, punctuation and letters. Later on the task, I realized I could define a list with all these 'special characters', so that a simple 'if' conditional would be enough. So, to look more elegant, I'll define the variable punctuation right here at the top.
+"""
+
+punctuation = [' ', ',', '.', '!', '?']
+
+for index in range(0, len(encoded_message)):
+  if encoded_message[index] in punctuation:
+    decoded_message += encoded_message[index]
+  else:
+    original_letter_position = alphabet.find(encoded_message[index]) 
+    decoded_letter = alphabet[(original_letter_position + 10) % len(alphabet)] 
+    decoded_message += decoded_letter
+ 
+"""
+    After some cleaning, I got the else condition down to these three steps: 
+
+      a) find the corresponding position of each original message's letter in alphabet; 
+      b) create the variable decoded_letter to hold the translated value for each character; 
+        b.1) point the decoded_letter variable to the character in the alphabet that is positioned 10 places to the right of the original message's letter; 
+        b.2) transform this index value so it is both positive and smaller than the length of the alphabet - for that, I used the module operator;
+      c) concatenate the decoded letter to the variable created to hold the translated message.
+"""
+
+print("Task 1: Decode Vishal's message using a Caesar Cypher and print the result:\n")
+print(decoded_message + "\n")
+
+# Task 2: encoding new message:
+
+#First,  I'll create the variables to hold the messages. The original message will be called uncoded_message, and the translated message will be encoded_message, now reassigned:
+
+encoded_message = ""
+uncoded_message = "i got your message, vishal! now it's your turn to decode mine. could you do it?"
+
+for index in range(0, len(uncoded_message)):
+  if uncoded_message[index] in punctuation:
+    encoded_message += uncoded_message[index]
+  else:
+    original_letter_position = alphabet.find(uncoded_message[index]) 
+    encoded_letter = alphabet[(original_letter_position - 10) % len(alphabet)] 
+    encoded_message += encoded_letter
+
+print("Task 2: Encode an original message using Caesar Cypher and print the result:\n")
+print(encoded_message + "\n")
+
+#Task 3: Defining function to decode.
+
+#Encoded and decoded message variables, will now be assigned inside the function, the first one as an argument. The punctuation and the alphabet variables will also be inserted inside function, so everything that is needed can be found at the same place:
+
+def caesar_decode(encoded_message, offset):
+  alphabet = "abcdefghijklmnopqrstuvwxyz"
+  punctuation = [' ', ',', '.', '!', '?', "'"]
+  decoded_message = ''
+  for index in range(0, len(encoded_message)):
+    if encoded_message[index] in punctuation:
+      decoded_message += encoded_message[index]
+    else:
+      original_letter_position = alphabet.find(encoded_message[index]) 
+      decoded_letter = alphabet[(original_letter_position + offset) % len(alphabet)] 
+      decoded_message += decoded_letter
+  return decoded_message
+
+print("Task 3: Define a function to decode any message using Caesar Cypher, then test it on two new messages:\n")
+print("Message 1: \n" + caesar_decode("jxu evviuj veh jxu iusedt cuiiqwu yi vekhjuud", 10) + "\n")
+print("Message 2: \n" + caesar_decode("bqdradyuzs ygxfubxq omqemd oubtqde fa oapq kagd yqeemsqe ue qhqz yadq eqogdq!", 14) + "\n")
+
+#Task 4: Defining function to encode:
+
+def caesar_encode(uncoded_message, offset):
+  alphabet = "abcdefghijklmnopqrstuvwxyz"
+  punctuation = [' ', ',', '.', '!', '?']
+  encoded_message = ''
+  for index in range(0, len(uncoded_message)):
+    if uncoded_message[index] in punctuation:
+      encoded_message += uncoded_message[index]
+    else:
+      original_letter_position = alphabet.find(uncoded_message[index]) 
+      encoded_letter = alphabet[(original_letter_position - offset) % len(alphabet)] 
+      encoded_message += encoded_letter
+  return encoded_message
+
+print("Task 3: Define a function to encode any message using Caesar Cypher, then test it on an orignal message:\n")
+print(caesar_encode("Hey! I was able to decode your message after some effort. Hope you decode mine too.", 10) + "\n")
+
+#Task 4: Using brute force to find offset:
+
+#For this task I tested each possible offset value, beggining.
+
+print("Task 4: Use the decode function to translating a message, not knowing what is the value of the offset:\n")
+print(caesar_decode("vhfinmxkl atox kxgwxkxw tee hy maxlx hew vbiaxkl hulhexmx. px'ee atox mh kxteer lmxi ni hnk ztfx by px ptgm mh dxxi hnk fxlltzxl ltyx", 7) + "\n")
+
+#Vigenere Cipher:
+  #Defining decoder function:
+
+def vigenere_decode(message, keyword):
+  counter = 0 #Defined this variable to iterate through each character on the message, transforming them into the keyword phrase.
+  punctuation = [' ', ',', '.', '!', '?'] #Defined this variable to list non-letter possibilites, giving them another treatment using the conditional "if"
+  keyword_phrase = '' #Defined this variable to hold a keyword phrase that will be used later to translate the message.
+  decoded_message = '' #Defined this variable to receive each character from the final message, already decoded.
+  
+  #Making the first "for" loop to find the keyword phrase:
+
+  for index in range(0, len(message)):
+    if message[index] in punctuation:
+      keyword_phrase += message[index]
+    else:
+      keyword_phrase += keyword[counter]
+      counter = (counter + 1) % len(keyword)
+
+  #The second 'for' loop will add the position in the alphabet of each character in the keyword phrase, as well as each character in the message. Punctuation characters will be treated differently, once again, by using a nested conditional.
+
+  for index in range(0, len(message)): #Keeping the same loop, because it'll iterate the same message
+    if message[index] in punctuation:
+      decoded_message += message[index]
+    else:
+      keyword_phrase_place_value = alphabet.find(message[index]) #Took the names 'keyword phrase', 'place value' and 'resulting place value' from the tasks descriptions to enhance readability.
+      message_place_value = alphabet.find(keyword_phrase[index])
+      resulting_place_value = keyword_phrase_place_value + message_place_value
+      decoded_message += alphabet[resulting_place_value%len(alphabet)] #Used the module operator to always get values both positive and under the length of the alphabet.
+  return decoded_message
+
+print("Task 5: Define a function to decode any message using Vigenere Cypher, then test it on a pre-defined message:\n")
+print(vigenere_decode("txm srom vkda gl lzlgzr qpdb? fepb ejac! ubr imn tapludwy mhfbz cza ruxzal wg zztylktoikqq!","friends") + "\n")
+
+#Task 6: Define a function to encode any message using Vigenere Cypher, then test it on an original message, using an original keyword:
+  #Encoder:
+
+def vigenere_encode(message, keyword):
+  counter = 0 #Defined this variable to iterate through each character on the message, transforming them into the keyword phrase.
+  punctuation = [' ', ',', '.', '!', '?'] #Defined this variable to list non-letter possibilites, giving them another treatment using the conditional "if"
+  keyword_phrase = '' #Defined this variable to hold a keyword phrase that will be used later to translate the message.
+  encoded_message = '' #Defined this variable to receive each character from the final message, already decoded.
+  
+  #Making the first "for" loop to find the keyword phrase:
+
+  for index in range(0, len(message)):
+    if message[index] in punctuation:
+      keyword_phrase += message[index]
+    else:
+      keyword_phrase += keyword[counter]
+      counter = (counter + 1) % len(keyword)
+
+  #The second 'for' loop will calculate the difference between the position in the alphabet of each character in the keyword phrase and each character in the message. Punctuation characters will be treated differently, once again, by using a nested conditional.
+
+  for index in range(0, len(message)): #Keeping the same loop, because it'll iterate the same message
+    if message[index] in punctuation:
+      encoded_message += message[index]
+    else:
+      keyword_phrase_place_value = alphabet.find(message[index]) #Took the names 'keyword phrase', 'place value' and 'resulting place value' from the tasks descriptions to enhance readability.
+      message_place_value = alphabet.find(keyword_phrase[index])
+      resulting_place_value = keyword_phrase_place_value - message_place_value #Changed the plus operator to minus to have the opposite effect on the message, in comparison to the decoder.
+      encoded_message += alphabet[resulting_place_value%len(alphabet)] #Used the module operator to always get values both positive and under the length of the alphabet.
+  return encoded_message
+
+print("Task 6: Define a function to decode any message using Vigenere Cypher, then test it on a pre-defined message:\n")
+print(vigenere_encode("try this one!", "mystery") + "\n")
+
+print("Finally, test decoding it back to english: \n")
+print(vigenere_decode("htg adru cpm!", "mystery"))
